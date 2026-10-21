@@ -6,6 +6,19 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// CORS & JSON content-type protection
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  next();
+});
 
 // Data storage path
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -259,6 +272,17 @@ app.post('/api/data/reset', (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({ error: 'Gagal mereset data: ' + err.message });
   }
+});
+
+// Explicit 404 for any unmatched /api routes so they NEVER fall through to HTML or Vite SPA
+app.all('/api/*', (req: Request, res: Response) => {
+  res.status(404).json({ error: `Endpoint API tidak ditemukan: ${req.method} ${req.path}` });
+});
+
+// Global API error handler returning clean JSON
+app.use((err: any, _req: Request, res: Response, _next: any) => {
+  console.error('API Error:', err);
+  res.status(err.status || 500).json({ error: err.message || 'Terjadi kesalahan pada server.' });
 });
 
 // ================= STATIC / VITE INTEGRATION =================

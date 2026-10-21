@@ -39,26 +39,35 @@ export const fetchServerData = async (): Promise<{
       }
     });
 
-    if (res.ok) {
-      const data = await res.json();
-      const assets: OfficeAsset[] = Array.isArray(data.assets) ? data.assets : [];
-      const loans: AssetLoan[] = Array.isArray(data.loans) ? data.loans : [];
-      const tasks: MaintenanceTask[] = Array.isArray(data.tasks) ? data.tasks : [];
-      const logs: MaintenanceLog[] = Array.isArray(data.logs) ? data.logs : [];
-      const settings: CompanySettings = data.settings || initialCompanySettings;
-
-      // Update local storage cache
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
+      let data: any = null;
       try {
-        localStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify(assets));
-        localStorage.setItem(STORAGE_KEYS.LOANS, JSON.stringify(loans));
-        localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
-        localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
-        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-      } catch (e) {
-        // local storage quota or private mode
+        data = await res.json();
+      } catch (jsonErr) {
+        console.warn('Failed parsing server JSON:', jsonErr);
       }
 
-      return { assets, loans, tasks, logs, settings, fromServer: true };
+      if (data) {
+        const assets: OfficeAsset[] = Array.isArray(data.assets) ? data.assets : [];
+        const loans: AssetLoan[] = Array.isArray(data.loans) ? data.loans : [];
+        const tasks: MaintenanceTask[] = Array.isArray(data.tasks) ? data.tasks : [];
+        const logs: MaintenanceLog[] = Array.isArray(data.logs) ? data.logs : [];
+        const settings: CompanySettings = data.settings || initialCompanySettings;
+
+        // Update local storage cache
+        try {
+          localStorage.setItem(STORAGE_KEYS.ASSETS, JSON.stringify(assets));
+          localStorage.setItem(STORAGE_KEYS.LOANS, JSON.stringify(loans));
+          localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+          localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logs));
+          localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+        } catch (e) {
+          // local storage quota or private mode
+        }
+
+        return { assets, loans, tasks, logs, settings, fromServer: true };
+      }
     }
   } catch (err) {
     console.warn('Cannot reach server API directly, using local storage cache:', err);
@@ -121,12 +130,14 @@ export const syncDataToServer = async (payload: {
     const res = await fetch('/api/data', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify(payload)
     });
 
-    if (res.ok) {
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
       const data = await res.json();
       return { success: true, savedAt: data.savedAt };
     }
@@ -148,7 +159,10 @@ export const resetAllData = async (): Promise<boolean> => {
 
     const res = await fetch('/api/data/reset', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
     });
 
     return res.ok;
@@ -174,6 +188,10 @@ export const setStoredAuthUser = (user: any) => {
       localStorage.setItem(STORAGE_KEYS.AUTH, JSON.stringify(user));
     } else {
       localStorage.removeItem(STORAGE_KEYS.AUTH);
+      localStorage.removeItem('ga_inventory_auth_user');
+      localStorage.removeItem('ga_inventory_auth_user_v2');
+      localStorage.removeItem('ga_auth_user');
+      sessionStorage.clear();
     }
   } catch {}
 };

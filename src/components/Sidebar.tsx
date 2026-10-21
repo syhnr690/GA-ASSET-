@@ -222,7 +222,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={onLogout}
               type="button"
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-slate-800/80 hover:bg-rose-900/40 text-slate-300 hover:text-rose-300 rounded-lg text-xs font-semibold transition-colors border border-slate-700/60 hover:border-rose-700/60"
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-slate-800/80 hover:bg-rose-900/40 text-slate-300 hover:text-rose-300 rounded-lg text-xs font-semibold transition-colors border border-slate-700/60 hover:border-rose-700/60 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5 text-rose-400" />
               <span>Keluar dari Akun (Logout)</span>
