@@ -1,0 +1,6 @@
+{
+  "name": "GA Asset & Inventory Manager",
+  "description": "Sistem Informasi Manajemen Inventaris GA: Pengelolaan Aset Kantor, Sirkulasi Peminjaman Barang, dan Otomasi Jadwal Perawatan Rutin.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

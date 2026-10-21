@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <script>
+      // Fix for extensions/interceptors attempting to override window.fetch when it only has a getter
+      (function() {
+        try {
+          var _nativeFetch = window.fetch;
+          var _currentFetch = _nativeFetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() {
+              return _currentFetch;
+            },
+            set: function(newFetch) {
+              _currentFetch = newFetch;
+            },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          // Fallback if property definition fails
+        }
+
+        // Intercept and suppress external browser extension runtime errors
+        window.addEventListener('error', function(event) {
+          if (
+            (event.filename && event.filename.includes('chrome-extension://')) ||
+            (event.message && event.message.includes('fetch of #<Window>'))
+          ) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reason = event.reason;
+          var msg = reason && (reason.message || reason.stack || String(reason));
+          if (msg && (msg.includes('chrome-extension://') || msg.includes('fetch of #<Window>'))) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }, true);
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GA Asset & Inventory Manager</title>
+    <meta name="description" content="Sistem Informasi Manajemen Inventaris GA: Pengelolaan Aset Kantor, Sirkulasi Peminjaman Barang, dan Otomasi Jadwal Perawatan Rutin." />
+    <meta property="og:title" content="GA Asset & Inventory Manager" />
+    <meta property="og:description" content="Sistem Informasi Manajemen Inventaris GA: Pengelolaan Aset Kantor, Sirkulasi Peminjaman Barang, dan Otomasi Jadwal Perawatan Rutin." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased font-sans selection:bg-slate-900 selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

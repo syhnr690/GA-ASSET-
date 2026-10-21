@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "id": "usr-admin-1",
+      "username": "admin",
+      "name": "Administrator GA",
+      "password": "admin",
+      "role": "Super Admin General Affairs",
+      "createdAt": "2026-10-19T23:50:00.000Z"
+    },
+    {
+      "id": "usr-admin-2",
+      "username": "syahnur",
+      "name": "S. Syahnur",
+      "password": "password123",
+      "role": "Koordinator General Affairs",
+      "createdAt": "2026-10-19T23:50:00.000Z"
+    }
+  ],
+  "assets": [],
+  "loans": [],
+  "tasks": [],
+  "logs": [],
+  "settings": {
+    "companyName": "PT Operasional Saya",
+    "officeLocation": "Kantor Pusat",
+    "gaDivisionName": "General Affairs & Facility Management",
+    "contactEmail": "s.syahnur1@gmail.com",
+    "contactPhone": "-",
+    "currency": "IDR"
+  }
+}
