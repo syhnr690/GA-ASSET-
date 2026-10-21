@@ -373,6 +373,22 @@ export default function App() {
     showToast('Profil perusahaan & Bagian Umum berhasil diperbarui.');
   };
 
+  // Handlers: Restore Database from JSON
+  const handleRestoreDatabase = (restored: {
+    assets: OfficeAsset[];
+    loans: AssetLoan[];
+    tasks: MaintenanceTask[];
+    logs: MaintenanceLog[];
+    settings: CompanySettings;
+  }) => {
+    setAssets(restored.assets);
+    setLoans(restored.loans);
+    setTasks(restored.tasks);
+    setLogs(restored.logs);
+    setSettings(restored.settings);
+    showToast(`Database berhasil dipulihkan: ${restored.assets.length} aset terdata.`);
+  };
+
   // Handlers: Export CSV
   const handleExportAll = () => {
     exportAssetsToCsv(assets);
@@ -731,7 +747,12 @@ export default function App() {
       {isSettingsOpen && (
         <SettingsModal
           settings={settings}
+          assets={assets}
+          loans={loans}
+          tasks={tasks}
+          logs={logs}
           onSave={handleSaveSettings}
+          onRestoreDatabase={handleRestoreDatabase}
           onClose={() => setIsSettingsOpen(false)}
         />
       )}
